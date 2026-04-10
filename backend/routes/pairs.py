@@ -16,6 +16,10 @@ from database import get_db
 from models import WatchedPair
 
 router = APIRouter(prefix="/api/pairs", tags=["pairs"])
+BINANCE_TICKER_BASES = (
+    "https://data-api.binance.vision",
+    "https://api.binance.com",
+)
 
 
 def _display(symbol: str) -> str:
@@ -97,13 +101,25 @@ def available_pairs() -> dict[str, list[str]]:
 @router.get("/{symbol}/stats")
 async def pair_stats(symbol: str) -> dict[str, Any]:
     sym = symbol.upper().replace("/", "")
-    url = "https://api.binance.com/api/v3/ticker/24hr"
+    t: dict[str, Any] | None = None
+    last_error: Exception | None = None
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.get(url, params={"symbol": sym})
-        if r.status_code == 400:
-            raise HTTPException(400, "Invalid symbol")
-        r.raise_for_status()
-        t = r.json()
+        for base in BINANCE_TICKER_BASES:
+            url = f"{base}/api/v3/ticker/24hr"
+            try:
+                r = await client.get(url, params={"symbol": sym})
+                if r.status_code == 400:
+                    raise HTTPException(400, "Invalid symbol")
+                r.raise_for_status()
+                t = r.json()
+                break
+            except HTTPException:
+                raise
+            except Exception as e:
+                last_error = e
+                continue
+    if t is None:
+        raise HTTPException(502, f"Upstream market data unavailable: {last_error}")
     last = float(t["lastPrice"])
     open_p = float(t["openPrice"])
     change_pct = ((last - open_p) / open_p * 100) if open_p else 0.0
@@ -131,5 +147,8 @@ async def pair_candles(
     lim = max(50, min(limit, 1000))
     # small stagger to respect rate limits when many clients hit at once
     await asyncio.sleep(0.05)
-    rows = await fetch_klines(sym, tf, lim)
+    try:
+        rows = await fetch_klines(sym, tf, lim)
+    except Exception as e:
+        raise HTTPException(502, f"Upstream market data unavailable: {e}")
     return {"symbol": sym, "tf": tf, "candles": rows}

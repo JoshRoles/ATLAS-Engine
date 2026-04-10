@@ -14,6 +14,10 @@ logger = logging.getLogger(__name__)
 
 TF_TO_STREAM = {"15m": "15m", "1h": "1h", "4h": "4h"}
 STREAM_TO_TF = {v: k for k, v in TF_TO_STREAM.items()}
+REST_BASES = (
+    "https://data-api.binance.vision",
+    "https://api.binance.com",
+)
 
 CandleHandler = Callable[[str, str, dict[str, Any], bool], Awaitable[None]]
 PriceHandler = Callable[[str, float], Awaitable[None]]
@@ -25,12 +29,22 @@ async def fetch_klines(
     limit: int = 200,
 ) -> list[dict[str, Any]]:
     """Public REST klines (no API key required)."""
-    url = "https://api.binance.com/api/v3/klines"
     params = {"symbol": symbol, "interval": interval, "limit": limit}
+    last_error: Exception | None = None
+    raw: list[Any] | None = None
     async with httpx.AsyncClient(timeout=30.0) as client:
-        r = await client.get(url, params=params)
-        r.raise_for_status()
-        raw = r.json()
+        for base in REST_BASES:
+            url = f"{base}/api/v3/klines"
+            try:
+                r = await client.get(url, params=params)
+                r.raise_for_status()
+                raw = r.json()
+                break
+            except Exception as e:
+                last_error = e
+                continue
+    if raw is None:
+        raise RuntimeError(f"binance klines unavailable for {symbol}/{interval}") from last_error
     out: list[dict[str, Any]] = []
     for row in raw:
         out.append(
