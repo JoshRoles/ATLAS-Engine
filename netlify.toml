@@ -1,0 +1,11 @@
+# Netlify: set base directory to "frontend" in the UI, or deploy from repo root with:
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
