@@ -4,6 +4,28 @@ export const DESKTOP_BREAKPOINT = 1100
 export const TIMEFRAMES = ['1m', '3m', '5m', '15m', '1h', '4h', '1d']
 export const DEFAULT_EMA_FAST = 9
 export const DEFAULT_EMA_SLOW = 21
+export const TOP_20_PAIRS = [
+  'BTCUSDT',
+  'ETHUSDT',
+  'BNBUSDT',
+  'SOLUSDT',
+  'XRPUSDT',
+  'ADAUSDT',
+  'DOGEUSDT',
+  'AVAXUSDT',
+  'DOTUSDT',
+  'MATICUSDT',
+  'LINKUSDT',
+  'UNIUSDT',
+  'ATOMUSDT',
+  'LTCUSDT',
+  'ETCUSDT',
+  'FILUSDT',
+  'APTUSDT',
+  'ARBUSDT',
+  'OPUSDT',
+  'NEARUSDT',
+]
 
 export const COLORS = {
   bg: '#070a0e',

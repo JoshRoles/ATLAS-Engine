@@ -1,16 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import { apiGet, apiSend } from '../api'
+import { TOP_20_PAIRS } from '../constants'
 import { useStore } from '../store/useStore'
 
 export function AddPairModal({ open, onClose }) {
-  const [available, setAvailable] = useState([])
+  const [available, setAvailable] = useState(TOP_20_PAIRS)
+  const [loadError, setLoadError] = useState('')
   const setPairs = useStore((s) => s.setPairs)
 
   useEffect(() => {
     if (!open) return
     apiGet('/api/pairs/available')
-      .then((d) => setAvailable(d.symbols || []))
-      .catch(() => setAvailable([]))
+      .then((d) => {
+        const symbols = d.symbols || TOP_20_PAIRS
+        setAvailable(symbols.length ? symbols : TOP_20_PAIRS)
+        setLoadError('')
+      })
+      .catch(() => {
+        setAvailable(TOP_20_PAIRS)
+        setLoadError('Using local pair list (API blocked or offline).')
+      })
   }, [open])
 
   const pairs = useStore((s) => s.pairs)
@@ -27,6 +36,7 @@ export function AddPairModal({ open, onClose }) {
             ✕
           </button>
         </div>
+        {loadError && <div className="mb-2 text-[11px] text-ae-amber">{loadError}</div>}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {available.map((sym) => {
             const on = watched.has(sym)
