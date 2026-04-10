@@ -1,5 +1,7 @@
 # Run & deploy guide — Atlas Engine
 
+Full **GitHub → Railway (API) → Vercel (UI)** steps: see **`DEPLOY.md`**.
+
 ## Local development
 
 1. **Start the API first** (port 8000): see `CURSOR_BRIEF.md` (`uvicorn` from `backend/`).  
