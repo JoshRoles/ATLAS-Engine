@@ -58,15 +58,23 @@ function rsiFromBars(bars, period = 14) {
   return out
 }
 
-export function Chart({ pair, tf, emaFast = 9, emaSlow = 21 }) {
+export function Chart({
+  pair,
+  tf,
+  emaConfigs = [
+    { period: 9, color: '#3b9eff' },
+    { period: 21, color: '#f5a623' },
+    { period: 50, color: '#22d3ee' },
+    { period: 200, color: '#a78bfa' },
+  ],
+}) {
   const containerRef = useRef(null)
   const rsiContainerRef = useRef(null)
   const chartRef = useRef(null)
   const rsiChartRef = useRef(null)
   const seriesRef = useRef(null)
   const volRef = useRef(null)
-  const ema9Ref = useRef(null)
-  const ema21Ref = useRef(null)
+  const emaRefs = useRef([])
   const vwapRef = useRef(null)
   const rsiSeriesRef = useRef(null)
   const priceLineRefs = useRef([])
@@ -118,18 +126,14 @@ export function Chart({ pair, tf, emaFast = 9, emaSlow = 21 }) {
       scaleMargins: { top: 0.85, bottom: 0 },
     })
 
-    const e9 = chart.addLineSeries({
-      color: COLORS.blue,
-      lineWidth: 2,
-      priceLineVisible: false,
-      lastValueVisible: false,
-    })
-    const e21 = chart.addLineSeries({
-      color: COLORS.amber,
-      lineWidth: 2,
-      priceLineVisible: false,
-      lastValueVisible: false,
-    })
+    const lines = emaConfigs.map((cfg) =>
+      chart.addLineSeries({
+        color: cfg.color,
+        lineWidth: 2,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      }),
+    )
     const vw = chart.addLineSeries({
       color: COLORS.purple,
       lineWidth: 2,
@@ -141,8 +145,7 @@ export function Chart({ pair, tf, emaFast = 9, emaSlow = 21 }) {
     chartRef.current = chart
     seriesRef.current = candle
     volRef.current = vol
-    ema9Ref.current = e9
-    ema21Ref.current = e21
+    emaRefs.current = lines
     vwapRef.current = vw
 
     const rsiChart = createChart(rsiContainerRef.current, {
@@ -194,13 +197,12 @@ export function Chart({ pair, tf, emaFast = 9, emaSlow = 21 }) {
       seriesRef.current = null
       priceLineRefs.current = []
     }
-  }, [pair, tf, key])
+  }, [pair, tf, key, emaConfigs])
 
   useEffect(() => {
     const candle = seriesRef.current
     const vol = volRef.current
-    const e9 = ema9Ref.current
-    const e21 = ema21Ref.current
+    const emaLines = emaRefs.current
     const vw = vwapRef.current
     const rsiS = rsiSeriesRef.current
     if (!candle || !candles.length) return
@@ -224,8 +226,10 @@ export function Chart({ pair, tf, emaFast = 9, emaSlow = 21 }) {
       })),
     )
 
-    e9.setData(emaFromBars(candles, emaFast))
-    e21.setData(emaFromBars(candles, emaSlow))
+    emaLines.forEach((line, idx) => {
+      const period = emaConfigs[idx]?.period ?? 9
+      line.setData(emaFromBars(candles, period))
+    })
     vw.setData(vwapFromBars(candles))
 
     const rsiData = rsiFromBars(candles, 14)
@@ -268,7 +272,7 @@ export function Chart({ pair, tf, emaFast = 9, emaSlow = 21 }) {
     })
 
     chartRef.current?.timeScale().fitContent()
-  }, [candles, structure, lastPrice, key, emaFast, emaSlow])
+  }, [candles, structure, lastPrice, key, emaConfigs])
 
   if (!pair) {
     return (

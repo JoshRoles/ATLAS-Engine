@@ -2,8 +2,8 @@ export const FOLD_BREAKPOINT = 600
 export const DESKTOP_BREAKPOINT = 1100
 
 export const TIMEFRAMES = ['1m', '3m', '5m', '15m', '1h', '4h', '1d']
-export const DEFAULT_EMA_FAST = 9
-export const DEFAULT_EMA_SLOW = 21
+export const DEFAULT_EMA_PERIODS = [9, 21, 50, 200]
+export const DEFAULT_EMA_COLORS = ['#3b9eff', '#f5a623', '#22d3ee', '#a78bfa']
 export const TOP_20_PAIRS = [
   'BTCUSDT',
   'ETHUSDT',

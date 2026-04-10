@@ -34,10 +34,10 @@ export function Watch() {
   const setups = useStore((s) => s.setups)
   const showAdd = useStore((s) => s.showAddPair)
   const setShowAddPair = useStore((s) => s.setShowAddPair)
-  const emaFast = useStore((s) => s.emaFast)
-  const emaSlow = useStore((s) => s.emaSlow)
-  const setEmaFast = useStore((s) => s.setEmaFast)
-  const setEmaSlow = useStore((s) => s.setEmaSlow)
+  const emaPeriods = useStore((s) => s.emaPeriods)
+  const emaColors = useStore((s) => s.emaColors)
+  const setEmaPeriodAt = useStore((s) => s.setEmaPeriodAt)
+  const setEmaColorAt = useStore((s) => s.setEmaColorAt)
 
   const [spark, setSpark] = useState({})
 
@@ -85,6 +85,14 @@ export function Watch() {
   useEffect(() => {
     if (!activePair) return
     loadCandles(activePair, activeTF).catch(() => {})
+  }, [activePair, activeTF, loadCandles])
+
+  useEffect(() => {
+    if (!activePair) return
+    const id = window.setInterval(() => {
+      loadCandles(activePair, activeTF).catch(() => {})
+    }, 1000)
+    return () => window.clearInterval(id)
   }, [activePair, activeTF, loadCandles])
 
   useEffect(() => {
@@ -160,28 +168,28 @@ export function Watch() {
             {tf}
           </button>
         ))}
-        <select
-          className="rounded border border-ae-border bg-ae-bg px-2 py-1 text-[10px] text-ae-mid"
-          value={emaFast}
-          onChange={(e) => setEmaFast(parseInt(e.target.value, 10))}
-        >
-          {[5, 7, 9, 12, 20, 25, 50].map((v) => (
-            <option key={v} value={v}>
-              EMA {v}
-            </option>
-          ))}
-        </select>
-        <select
-          className="rounded border border-ae-border bg-ae-bg px-2 py-1 text-[10px] text-ae-mid"
-          value={emaSlow}
-          onChange={(e) => setEmaSlow(parseInt(e.target.value, 10))}
-        >
-          {[21, 30, 50, 99, 100, 200].map((v) => (
-            <option key={v} value={v}>
-              EMA {v}
-            </option>
-          ))}
-        </select>
+        {[0, 1, 2, 3].map((idx) => (
+          <div key={idx} className="flex items-center gap-1">
+            <select
+              className="rounded border border-ae-border bg-ae-bg px-2 py-1 text-[10px] text-ae-mid"
+              value={emaPeriods[idx]}
+              onChange={(e) => setEmaPeriodAt(idx, parseInt(e.target.value, 10))}
+            >
+              {[5, 7, 9, 12, 20, 21, 25, 50, 99, 100, 200].map((v) => (
+                <option key={v} value={v}>
+                  EMA {v}
+                </option>
+              ))}
+            </select>
+            <input
+              type="color"
+              value={emaColors[idx]}
+              onChange={(e) => setEmaColorAt(idx, e.target.value)}
+              className="h-6 w-7 rounded border border-ae-border bg-ae-bg p-0"
+              title={`EMA ${idx + 1} color`}
+            />
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -190,7 +198,11 @@ export function Watch() {
     <div className="flex min-h-[420px] flex-1 flex-col rounded border border-ae-border bg-ae-card p-2">
       {chartHeader}
       <div className="min-h-[360px] flex-1">
-        <Chart pair={activePair} tf={activeTF} emaFast={emaFast} emaSlow={emaSlow} />
+        <Chart
+          pair={activePair}
+          tf={activeTF}
+          emaConfigs={emaPeriods.map((period, i) => ({ period, color: emaColors[i] }))}
+        />
       </div>
     </div>
   )

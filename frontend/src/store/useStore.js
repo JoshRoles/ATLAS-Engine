@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { DEFAULT_EMA_FAST, DEFAULT_EMA_SLOW } from '../constants'
+import { DEFAULT_EMA_COLORS, DEFAULT_EMA_PERIODS } from '../constants'
 
 const cacheKey = (pair, tf) => `${pair}_${tf}`
 
@@ -39,14 +39,24 @@ export const useStore = create((set, get) => ({
     })),
 
   activePair: null,
-  activeTF: '15m',
+  activeTF: '1m',
   setActivePair: (p) => set({ activePair: p }),
   setActiveTF: (tf) => set({ activeTF: tf }),
 
-  emaFast: DEFAULT_EMA_FAST,
-  emaSlow: DEFAULT_EMA_SLOW,
-  setEmaFast: (v) => set({ emaFast: v }),
-  setEmaSlow: (v) => set({ emaSlow: v }),
+  emaPeriods: DEFAULT_EMA_PERIODS,
+  emaColors: DEFAULT_EMA_COLORS,
+  setEmaPeriodAt: (idx, v) =>
+    set((s) => {
+      const next = [...s.emaPeriods]
+      next[idx] = v
+      return { emaPeriods: next }
+    }),
+  setEmaColorAt: (idx, v) =>
+    set((s) => {
+      const next = [...s.emaColors]
+      next[idx] = v
+      return { emaColors: next }
+    }),
 
   signals: [],
   setSignals: (signals) => set({ signals }),
