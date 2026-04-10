@@ -3,6 +3,8 @@ import { createChart, ColorType, CrosshairMode } from 'lightweight-charts'
 import { COLORS } from '../constants'
 import { useStore } from '../store/useStore'
 
+const EMPTY = []
+
 function emaFromBars(bars, period) {
   if (!bars.length) return []
   const k = 2 / (period + 1)
@@ -70,7 +72,7 @@ export function Chart({ pair, tf }) {
   const priceLineRefs = useRef([])
   const candles = useStore((s) => {
     const k = pair && tf ? `${pair}_${tf}` : ''
-    return k ? s.candles[k] || [] : []
+    return k ? (s.candles[k] ?? EMPTY) : EMPTY
   })
   const structure = useStore((s) => {
     const k = pair && tf ? `${pair}_${tf}` : ''

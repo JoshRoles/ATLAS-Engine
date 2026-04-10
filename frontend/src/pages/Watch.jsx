@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { apiGet } from '../api'
 import { Chart } from '../components/Chart'
 import { AddPairModal } from '../components/AddPairModal'
@@ -18,7 +18,7 @@ export function Watch() {
   const setActiveTF = useStore((s) => s.setActiveTF)
   const setCandles = useStore((s) => s.setCandles)
   const signals = useStore((s) => s.signals)
-  const openSetups = useStore((s) => s.setups.filter((x) => x.status === 'open'))
+  const setups = useStore((s) => s.setups)
   const showAdd = useStore((s) => s.showAddPair)
   const setShowAddPair = useStore((s) => s.setShowAddPair)
 
@@ -81,6 +81,11 @@ export function Watch() {
       cancelled = true
     }
   }, [activePair, pairs])
+
+  const openSetups = useMemo(
+    () => setups.filter((x) => x.status === 'open'),
+    [setups],
+  )
 
   const sigFor = (sym) => signals.find((x) => x.pair === sym)
   const tradeFor = (sym) => openSetups.find((x) => x.pair === sym)

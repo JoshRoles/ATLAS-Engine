@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { apiGet, apiSend } from '../api'
 import { useStore } from '../store/useStore'
 
@@ -13,7 +13,8 @@ export function AddPairModal({ open, onClose }) {
       .catch(() => setAvailable([]))
   }, [open])
 
-  const watched = useStore((s) => new Set(s.pairs.map((p) => p.symbol)))
+  const pairs = useStore((s) => s.pairs)
+  const watched = useMemo(() => new Set(pairs.map((p) => p.symbol)), [pairs])
 
   if (!open) return null
 
