@@ -111,7 +111,9 @@ app = FastAPI(title="Atlas Engine", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_list(),
-    allow_credentials=True,
+    # This app does not rely on cookies/session auth; keep credentials off so
+    # wildcard origins (dev) and strict origins (prod) both work reliably.
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
