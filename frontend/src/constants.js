@@ -1,6 +1,9 @@
 export const FOLD_BREAKPOINT = 600
+export const DESKTOP_BREAKPOINT = 1100
 
-export const TIMEFRAMES = ['15m', '1h', '4h']
+export const TIMEFRAMES = ['1m', '3m', '5m', '15m', '1h', '4h', '1d']
+export const DEFAULT_EMA_FAST = 9
+export const DEFAULT_EMA_SLOW = 21
 
 export const COLORS = {
   bg: '#070a0e',

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FOLD_BREAKPOINT } from '../constants'
+import { DESKTOP_BREAKPOINT, FOLD_BREAKPOINT } from '../constants'
 import { useStore } from '../store/useStore'
 import { NavBar } from './NavBar'
 
@@ -11,19 +11,20 @@ const tabs = [
 ]
 
 export function Layout({ children }) {
-  const [wide, setWide] = useState(
-    typeof window !== 'undefined' ? window.innerWidth >= FOLD_BREAKPOINT : false,
-  )
+  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0)
   const activeTab = useStore((s) => s.activeTab)
   const setActiveTab = useStore((s) => s.setActiveTab)
   const wsConnected = useStore((s) => s.wsConnected)
   const n = useStore((s) => s.newSignalCount)
 
   useEffect(() => {
-    const onR = () => setWide(window.innerWidth >= FOLD_BREAKPOINT)
+    const onR = () => setWidth(window.innerWidth)
     window.addEventListener('resize', onR)
     return () => window.removeEventListener('resize', onR)
   }, [])
+
+  const mode = width >= DESKTOP_BREAKPOINT ? 'desktop' : width >= FOLD_BREAKPOINT ? 'fold' : 'mobile'
+  const wide = mode !== 'mobile'
 
   return (
     <div className="flex min-h-full flex-col md:flex-row">

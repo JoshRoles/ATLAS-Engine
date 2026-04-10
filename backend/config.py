@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     candle_lookback: int = 200
     max_candles_cache: int = 500
-    active_timeframes: tuple[str, ...] = ("15m", "1h", "4h")
+    active_timeframes: tuple[str, ...] = ("1m", "3m", "5m", "15m", "1h", "4h", "1d")
     signal_dedup_hours: int = 4
     signal_ttl_hours: int = 4
 

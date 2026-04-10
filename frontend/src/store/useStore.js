@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { DEFAULT_EMA_FAST, DEFAULT_EMA_SLOW } from '../constants'
 
 const cacheKey = (pair, tf) => `${pair}_${tf}`
 
@@ -41,6 +42,11 @@ export const useStore = create((set, get) => ({
   activeTF: '15m',
   setActivePair: (p) => set({ activePair: p }),
   setActiveTF: (tf) => set({ activeTF: tf }),
+
+  emaFast: DEFAULT_EMA_FAST,
+  emaSlow: DEFAULT_EMA_SLOW,
+  setEmaFast: (v) => set({ emaFast: v }),
+  setEmaSlow: (v) => set({ emaSlow: v }),
 
   signals: [],
   setSignals: (signals) => set({ signals }),

@@ -12,7 +12,15 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
-TF_TO_STREAM = {"15m": "15m", "1h": "1h", "4h": "4h"}
+TF_TO_STREAM = {
+    "1m": "1m",
+    "3m": "3m",
+    "5m": "5m",
+    "15m": "15m",
+    "1h": "1h",
+    "4h": "4h",
+    "1d": "1d",
+}
 STREAM_TO_TF = {v: k for k, v in TF_TO_STREAM.items()}
 REST_BASES = (
     "https://data-api.binance.vision",

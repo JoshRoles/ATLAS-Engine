@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from binance_feed import fetch_klines
+from binance_feed import TF_TO_STREAM, fetch_klines
 from config import settings
 from database import get_db
 from models import WatchedPair
@@ -141,7 +141,7 @@ async def pair_candles(
     limit: int = 200,
 ) -> dict[str, Any]:
     sym = symbol.upper().replace("/", "")
-    allowed = {"15m", "1h", "4h"}
+    allowed = set(TF_TO_STREAM.keys())
     if tf not in allowed:
         raise HTTPException(400, "Invalid timeframe")
     lim = max(50, min(limit, 1000))

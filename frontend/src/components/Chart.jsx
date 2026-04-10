@@ -58,7 +58,7 @@ function rsiFromBars(bars, period = 14) {
   return out
 }
 
-export function Chart({ pair, tf }) {
+export function Chart({ pair, tf, emaFast = 9, emaSlow = 21 }) {
   const containerRef = useRef(null)
   const rsiContainerRef = useRef(null)
   const chartRef = useRef(null)
@@ -224,8 +224,8 @@ export function Chart({ pair, tf }) {
       })),
     )
 
-    e9.setData(emaFromBars(candles, 9))
-    e21.setData(emaFromBars(candles, 21))
+    e9.setData(emaFromBars(candles, emaFast))
+    e21.setData(emaFromBars(candles, emaSlow))
     vw.setData(vwapFromBars(candles))
 
     const rsiData = rsiFromBars(candles, 14)
@@ -268,7 +268,7 @@ export function Chart({ pair, tf }) {
     })
 
     chartRef.current?.timeScale().fitContent()
-  }, [candles, structure, lastPrice, key])
+  }, [candles, structure, lastPrice, key, emaFast, emaSlow])
 
   if (!pair) {
     return (
